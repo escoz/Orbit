@@ -1,7 +1,0 @@
-
-target 'Orbit', :exclusive => true do
-  pod "Orbit", :path => "../"
-
-  pod 'Specta', '~> 0.2.1'
-  pod 'Expecta'
-end

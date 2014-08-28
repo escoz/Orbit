@@ -7,7 +7,19 @@
 
 ## Usage
 
-To run the example project, clone the repo, and run `pod install` from the Example directory first.
+Orbit is a simple dependency injection for your Obj-C projects. Say goodbye to singletons everywhere.
+
+Orbit simplifies creation of domains and viewControllers on your class, by forcing you to follow simple and 
+straightforward rules on how objects can be created. 
+
+- it only supports property injection
+- it always uses the init: initializer for classes
+- it doesnt support recursion when creating objects.
+- it currently doesnt support protocols
+
+Orbit is a great way to quickly cleanup object sharing and singletons in your application.
+
+More documentation will come.
 
 ## Requirements
 
