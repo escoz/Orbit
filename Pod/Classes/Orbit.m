@@ -153,23 +153,30 @@ Orbit *__DEFAULT_ORBIT;
 
 - (void)resolveProperties:(NSObject *)object
 {
-    unsigned int numberOfProperties;
-    objc_property_t *propertyArray = class_copyPropertyList([object class], &numberOfProperties);
 
-    for (NSUInteger i = 0; i < numberOfProperties; i++) {
-        objc_property_t property = propertyArray[i];
-        NSString *propertyName = [[NSString alloc] initWithUTF8String:property_getName(property)];
-        NSString *typeAttribute = [Orbit getTypeStringForProperty:propertyName onObject:object.class];
+    Class currentClass = [object class];
+    while (currentClass!=nil)
+    {
 
-        if ([typeAttribute hasPrefix:@"T@"] && [typeAttribute length] > 1 && [object valueForKey:propertyName]==nil) {
-            NSString *typeClassName = [typeAttribute substringWithRange:NSMakeRange(3, [typeAttribute length] - 4)];
-            Class typeClass = NSClassFromString(typeClassName);
-            if (typeClass != nil) {
-                NSObject *propertyValue = [self resolve:typeClass];
-                if (propertyValue !=nil)
-                    [object setValue:propertyValue forKey:propertyName];
+        unsigned int numberOfProperties;
+        objc_property_t *propertyArray = class_copyPropertyList(currentClass, &numberOfProperties);
+
+        for (NSUInteger i = 0; i < numberOfProperties; i++) {
+            objc_property_t property = propertyArray[i];
+            NSString *propertyName = [[NSString alloc] initWithUTF8String:property_getName(property)];
+            NSString *typeAttribute = [Orbit getTypeStringForProperty:propertyName onObject:object.class];
+
+            if ([typeAttribute hasPrefix:@"T@"] && [typeAttribute length] > 1 && [object respondsToSelector:NSSelectorFromString(propertyName)] && [object valueForKey:propertyName]==nil) {
+                NSString *typeClassName = [typeAttribute substringWithRange:NSMakeRange(3, [typeAttribute length] - 4)];
+                Class typeClass = NSClassFromString(typeClassName);
+                if (typeClass != nil) {
+                    NSObject *propertyValue = [self resolve:typeClass];
+                    if (propertyValue !=nil)
+                        [object setValue:propertyValue forKey:propertyName];
+                }
             }
         }
+        currentClass = class_getSuperclass(currentClass);
     }
 }
 
