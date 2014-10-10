@@ -166,7 +166,9 @@ Orbit *__DEFAULT_ORBIT;
             NSString *propertyName = [[NSString alloc] initWithUTF8String:property_getName(property)];
             NSString *typeAttribute = [Orbit getTypeStringForProperty:propertyName onObject:object.class];
 
-            if ([typeAttribute hasPrefix:@"T@"] && [typeAttribute length] > 1 && [object respondsToSelector:NSSelectorFromString(propertyName)] && [object valueForKey:propertyName]==nil) {
+            BOOL shouldVerifyProperty = [object respondsToSelector:NSSelectorFromString(propertyName)];
+            shouldVerifyProperty = shouldVerifyProperty && !([object isKindOfClass:[UIViewController class]] && [propertyName isEqualToString:@"view"]);
+            if ([typeAttribute hasPrefix:@"T@"] && [typeAttribute length] > 1 && shouldVerifyProperty && [object valueForKey:propertyName]==nil) {
                 NSString *typeClassName = [typeAttribute substringWithRange:NSMakeRange(3, [typeAttribute length] - 4)];
                 Class typeClass = NSClassFromString(typeClassName);
                 if (typeClass != nil) {
