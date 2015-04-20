@@ -23,7 +23,6 @@ typedef NS_ENUM(NSUInteger,OrbitScope) {
 - (void)register:(Class)pClass instance:(id)instance;
 - (void)register:(Class)pClass name:(NSString *)name instance:(id)instance;
 - (void)register:(Class)pClass scope:(enum OrbitScope)scope instance:(id)instance;
-
 - (NSObject *)resolve:(Class)pClass;
 
 @end

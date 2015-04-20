@@ -166,9 +166,8 @@ Orbit *__DEFAULT_ORBIT;
             NSString *propertyName = [[NSString alloc] initWithUTF8String:property_getName(property)];
             NSString *typeAttribute = [Orbit getTypeStringForProperty:propertyName onObject:object.class];
 
-            BOOL shouldVerifyProperty = [object respondsToSelector:NSSelectorFromString(propertyName)];
-            shouldVerifyProperty = shouldVerifyProperty && !([object isKindOfClass:[UIViewController class]] && [propertyName isEqualToString:@"view"]);
-            if ([typeAttribute hasPrefix:@"T@"] && [typeAttribute length] > 1 && shouldVerifyProperty && [object valueForKey:propertyName]==nil) {
+            BOOL shouldVerifyProperty = [self shouldResolvePropertyName:propertyName object:object];
+            if ([typeAttribute hasPrefix:@"T@"] && [typeAttribute length] > 3 && shouldVerifyProperty && [object valueForKey:propertyName]==nil) {
                 NSString *typeClassName = [typeAttribute substringWithRange:NSMakeRange(3, [typeAttribute length] - 4)];
                 Class typeClass = NSClassFromString(typeClassName);
                 if (typeClass != nil) {
@@ -180,6 +179,20 @@ Orbit *__DEFAULT_ORBIT;
         }
         currentClass = class_getSuperclass(currentClass);
     }
+}
+
+- (BOOL)shouldResolvePropertyName:(NSString *)propertyName object:(NSObject *)object
+{
+    BOOL shouldVerifyProperty = [object respondsToSelector:NSSelectorFromString(propertyName)];
+    if ([object isKindOfClass:[UIViewController class]]) {
+         if ([propertyName isEqualToString:@"view"] || [propertyName rangeOfString:@"LayoutGuide"].length>0)
+             shouldVerifyProperty = NO;
+    }
+    if ([object isKindOfClass:[UINavigationController class]]) {
+        if ([propertyName isEqualToString:@"toolbar"])
+            shouldVerifyProperty = NO;
+    }
+    return shouldVerifyProperty;
 }
 
 + (NSString *)getTypeStringForProperty:(NSString *)name onObject:(Class)object
